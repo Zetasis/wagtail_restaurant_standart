@@ -1,0 +1,17 @@
+{% load static %}
+{% load user_agents %}
+
+{# LOAD MOBILE MENU JS#}
+{% block extra_js %}
+<script type="text/javascript" src="{% static 'js/jquery-simple-mobilemenu.min.js' %}"></script>
+{% endblock %}
+
+{% load navigation_tags %}
+<ul class="mobile_menu">
+	{% get_navigation "navigation" as navigation %}
+	{% for item in navigation.menu_items.all %}
+		<li>
+			<a href="{{ item.link }}" {% if item.open_in_new_tab %} target="_blank"{% endif %}>{{ item.title }}</a>
+		</li>
+	{% endfor %}
+</ul>

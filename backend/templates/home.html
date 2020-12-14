@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load user_agents %}
+{% load static %}
+
+{% block extra_css %}
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.css">
+{% endblock %}
+
+{% block extra_js %}
+	<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js'></script>
+{% endblock %}
+
+{% load wagtailcore_tags wagtailimages_tags %}
+
+
+
+{% block content %}
+
+
+
+{{self.xx}}
+
+
+<section class="home__banner slider" data-sizes="50vw">
+{% for banner in self.banner_images.all %}
+	{% image banner.banner_image width-3560 as img %}
+	<div class="home__banner__inner" style="background-image: url('{{ img.url }}');">
+		<div class="content">
+			<div class="content_inner ">
+				<h2 class="animated">{{ banner.banner_title }}</h2>
+				{% if request|is_pc %}
+				<p class="animated">{{ banner.banner_subtitle }}</p>
+				{% else %}{% endif %} 
+			</div>
+		</div>
+	</div>
+{% endfor %}
+</section>
+
+
+{% endblock %}

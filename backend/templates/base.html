@@ -1,0 +1,235 @@
+{% load static wagtailuserbar %}
+{% load user_agents %}
+{% load wagtailcore_tags %}
+{% load wagtailimages_tags %}
+{% wagtail_site as current_site %}
+{% load wagtailimages_tags %}
+
+
+<!DOCTYPE html>
+<html class="no-js" lang="de">
+    <head>
+
+
+        {# META TITLES #}
+        <meta charset="utf-8" />
+        <title>{% block title %}{% if self.seo_title %}{{ self.seo_title }}{% else %}{{ self.title }}{% endif %}{% endblock %}{% block title_suffix %}{% with self.get_site.site_name as site_name %}{% if site_name %}- {{ site_name }}{% endif %}{% endwith %}{% endblock %}</title>
+        <meta name="description" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+
+        {# FONTS #}
+        {# Google Fonts #}
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        {# Google Fonts : Home Banner Font #}
+        <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700" rel="stylesheet">
+        
+
+
+        {# CSS #}
+        {# Global stylesheets #}
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css">
+
+
+        {% if request|is_pc %}
+        <link href="{% static 'css/styles.css' %}" rel="stylesheet" media="screen" />
+        <link href="https://unpkg.com/jquery-cookie-bubble@1.0.0/dist/cookieBubble.min.css" rel="stylesheet" media="screen" />
+        {% else %}
+        <link href="{% static 'css/mobile__styles.css' %}" rel="stylesheet" media="screen" />
+        {% endif %}
+
+        {% block extra_css %}{% endblock %}
+
+
+
+
+        {# JAVA SCRIPTS #}
+
+        {% if request|is_pc %}
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script type="text/javascript" src="{% static 'js/scripts.js' %}"></script>
+        <script type="text/javascript" src="https://unpkg.com/jquery-cookie-bubble@1.0.0/dist/cookieBubble.min.js"></script>
+        {% else %}
+        <script type="text/javascript" src="{% static 'js/jquery-simple-mobilemenu.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/scripts__mobile.js' %}"></script>
+        {% endif %}
+
+        {% block extra_js %}{% endblock %}
+
+        <link rel="shortcut icon" href="{% static 'img/favicon.png' %}"/>
+
+
+<script type="application/ld+json">
+{
+    "@context" : "http://schema.org",
+    "@type" : "Restaurant",
+    "@id": "https://{{ current_site.hostname }}/",
+    "url": "https://{{ current_site.hostname }}/",
+    {% image settings.company.CompanyInfo.company_jpg_logo width-800 as company_jpg_logo %}
+    "logo": "https://{{ current_site.hostname }}{{ company_jpg_logo.url }}",
+    "name":"{{ settings.company.CompanyInfo.company_name }}",
+    "email":"{{ settings.company.CompanyInfo.email }}",
+    "telephone": "{{ settings.company.CompanyInfo.phone1 }}",
+    "servesCuisine": ["afghanische,türkisches"],
+    "acceptsReservations":"{{ settings.company.CompanyInfo.reservations|yesno:"true,false" }}",
+    "menu":"https://{{ current_site.hostname }}/speisekarte/",
+    "currenciesAccepted": "{{ settings.company.CompanyInfo.currencies_accepted }}",
+    "paymentAccepted":"{{ settings.company.CompanyInfo.payment_accepted }}",
+    "priceRange" : "{{ settings.company.CompanyInfo.price_range }}",
+
+    {# Restaurant Menus Start#}
+    {% if page.restaurant_menu or page.restaurant_menu_flat or page.restaurant_menu_column%}
+    "hasMenu": {
+        "hasMenuSection": [
+            {# Restaurant Menu Start#}
+            {% if self.restaurant_menu %}
+            {
+                {% for foods_menu in self.restaurant_menu %}
+                    "@type": "MenuSection",
+                    "name": "{{ foods_menu.value.title }}",
+                    {% if foods_menu.value.image %}
+                        {% image foods_menu.value.image width-600 as food__img %}
+                        "image": "{{ request.get_host }}{{ food__img.url }}",
+                    {% endif %} 
+                    "hasMenuItem": [
+                        {% for food in foods_menu.value.foods %}
+                            {
+                                "@type": "MenuItem",
+                                "name": "{{ food.title }}",
+                                "description": "{{ food.description }}",
+                                {% if food.image %}
+                                    {% image food.image width-640 as food__img %}
+                                    "image": "https://{{ current_site.hostname }}{{ food__img.url }}",
+                                {% endif %}
+                                
+                                "offers": {
+                                  "@type": "Offer",
+                                  "price": "{{ food.price }}",
+                                  "priceCurrency": "{{ settings.company.CompanyInfo.currencies_accepted }}"
+                                }
+                            }{% if forloop.last %}{% else %},{% endif %}
+                        {% endfor %}
+                    ]
+                {% endfor %}
+            }
+            {% endif %}
+
+
+            {# Restaurant Menu Flat Start#}
+            {% if self.restaurant_menu_flat %},
+                {
+                    {% for foods_menu in self.restaurant_menu_flat %}
+                        "@type": "MenuSection",
+                        "name": "{{ foods_menu.value.title }}",
+                        {% if foods_menu.value.image %}
+                            {% image foods_menu.value.image width-600 as food__img %}
+                            "image": "{{ request.get_host }}{{ food__img.url }}",
+                        {% endif %} 
+                        "hasMenuItem": [
+                            {% for food in foods_menu.value.foods %}
+                                {
+                                    "@type": "MenuItem",
+                                    "name": "{{ food.title }}",
+                                    "description": "{{ food.description }}",
+                                    {% if food.image %}
+                                        {% image food.image width-640 as food__img %}
+                                        "image": "https://{{ current_site.hostname }}{{ food__img.url }}",
+                                    {% endif %}
+                                    
+                                    "offers": {
+                                      "@type": "Offer",
+                                      "price": "{{ food.price }}",
+                                      "priceCurrency": "{{ settings.company.CompanyInfo.currencies_accepted }}"
+                                    }
+                                }{% if forloop.last %}{% else %},{% endif %}
+                            {% endfor %}
+                        ]
+                    {% endfor %}
+                }
+            {% endif %}
+
+
+            {# Restaurant Menu Column Start#}
+            {% if self.restaurant_menu_column %},
+                {
+                    {% for foods_menu in self.restaurant_menu_column %}
+                        "@type": "MenuSection",
+                        "name": "{{ foods_menu.value.title }}",
+                        {% if foods_menu.value.image %}
+                            {% image foods_menu.value.image width-600 as food__img %}
+                            "image": "{{ request.get_host }}{{ food__img.url }}",
+                        {% endif %} 
+                        "hasMenuItem": [
+                            {% for food in foods_menu.value.foods %}
+                                {
+                                    "@type": "MenuItem",
+                                    "name": "{{ food.title }}",
+                                    "description": "{{ food.description }}",
+                                    {% if food.image %}
+                                        {% image food.image width-640 as food__img %}
+                                        "image": "https://{{ current_site.hostname }}{{ food__img.url }}",
+                                    {% endif %}
+                                    
+                                    "offers": {
+                                      "@type": "Offer",
+                                      "price": "{{ food.price }}",
+                                      "priceCurrency": "{{ settings.company.CompanyInfo.currencies_accepted }}"
+                                    }
+                                }{% if forloop.last %}{% else %},{% endif %}
+                            {% endfor %}
+                        ]
+                    {% endfor %}
+                }
+            {% endif %}
+        ]
+    },
+    {% endif %}
+    "address" : {
+        "@type": "PostalAddress",
+        "addressCountry": "{{ settings.company.CompanyInfo.country_code }}",
+        "addressLocality": "{{ settings.company.CompanyInfo.city }}",
+        "addressRegion": "{{ settings.company.CompanyInfo.region }}",
+        "postalCode": "{{ settings.company.CompanyInfo.post_code }}",
+        "streetAddress": "{{ settings.company.CompanyInfo.street }}" 
+    }{% if settings.company.CompanyInfo.latitude %},
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": {{ settings.company.CompanyInfo.latitude }},
+      "longitude": {{ settings.company.CompanyInfo.longitude }}
+    }{% endif %}{% if settings.company.CompanyInfo.company_photos1 %},
+    "image": [
+      "https://{{ current_site.hostname }}{% image settings.company.CompanyInfo.company_photos1 width-640 as company_photos1 %}{{ company_photos1.url }}"{% if settings.company.CompanyInfo.company_photos2 %},
+      "https://{{ current_site.hostname }}{% image settings.company.CompanyInfo.company_photos2 width-640 as company_photos2 %}{{ company_photos2.url }}"{% endif %}{% if settings.company.CompanyInfo.company_photos3 %},
+      "https://{{ current_site.hostname }}{% image settings.company.CompanyInfo.company_photos3 width-640 as company_photos3 %}{{ company_photos3.url }}"{% endif %}{% if settings.company.CompanyInfo.company_photos4 %},
+      "https://{{ current_site.hostname }}{% image settings.company.CompanyInfo.company_photos4 width-640 as company_photos4 %}{{ company_photos4.url }}"{% endif %}
+     ]{% endif %}
+
+} 
+</script>
+</head>
+<body class="{% if request.path == '/' %}home{% endif %}">
+
+
+{% if request|is_pc %}
+    {% include 'common/header.html' %}
+{% else %}
+    {% include 'common/mobile__header.html' %}
+{% endif %}    
+
+    <main>
+        {% block content %} {% endblock %}
+    </main>
+
+{% if request|is_pc %}
+    {% include 'common/footer.html' %}
+{% else %}
+    {% include 'common/mobile__footer.html' %}
+{% endif %}  
+
+
+
+<script type="text/javascript" src="{% static 'js/cookieBubble.js' %}"></script>
+    </body>
+</html>

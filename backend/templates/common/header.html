@@ -1,0 +1,57 @@
+{% load static %}
+{% load wagtailimages_tags cache %}
+{% load wagtailcore_tags %}
+{% load navigation_tags %}
+
+<div class="promo__top">
+	<ul class="max__container promo__container">
+		<li>
+			{% if settings.company.CompanyInfo.promote %}
+				{{ settings.company.CompanyInfo.promote|safe }}
+			{% endif %}
+			{% if settings.company.CompanyInfo.phone1 %}
+				<a href="tel:{{ settings.company.CompanyInfo.phone1 }}">
+					<i class="icons__default icons__phone"></i>
+					{{ settings.company.CompanyInfo.phone1 }}
+				</a>
+			{% endif %}
+		</li>
+	</ul>
+</div>
+
+<header>
+	<div class="inner">
+		<div class="logo">
+			<a href="{% url 'wagtail_serve' '' %}" class="logo">
+				<img src="{{ settings.company.CompanyInfo.company_svg_logo.url }}" alt="{{ settings.company.CompanyInfo.company_name }}" class="width_100">
+
+			</a>
+		</div>
+		<nav>
+			<ul class="main_navigation">
+				{% get_navigation "navigation" as navigation %}
+				{% for item in navigation.navigation_items.all %}
+					<li class="{% if request.path == item.link %}active{% endif %}">
+						<a href="{{ item.link }}" title="{{ item.title }}" {% if item.open_in_new_tab %} target="_blank"{% endif %}>{{ item.title }}</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</nav>
+		<ul class="social">
+			{% if settings.company.CompanyInfo.facebook %}
+			<li class="facebook">
+				<a href="{{ settings.company.CompanyInfo.facebook }}" target="_blank">
+							<i class="icons__default icons__facebook"></i>
+				</a>
+			</li>
+			{% endif %}
+			{% if settings.company.CompanyInfo.instagram %}
+			<li class="instagram">
+				<a href="{{ settings.company.CompanyInfo.instagram }}" target="_blank">
+					<i class="icons__default icons__instagram"></i>
+				</a>
+			</li>
+			{% endif %}
+		</ul>
+	</div>
+</header>
